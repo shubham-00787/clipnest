@@ -129,13 +129,17 @@ async def server_error_handler(request: Request, exc: Exception):
     return _error_response(request, "Something went wrong on our side. Try again.", 500)
 
 
+routes = [
+    Route("/api/health", health),
+    Route("/api/prepare", prepare, methods=["POST"]),
+    Route("/api/file", file),
+]
+# Everything in public/ (page, manifest, icons). On Vercel the CDN serves these
+# and the folder isn't inside the Python function, so only mount it when present.
+if PUBLIC_DIR.is_dir():
+    routes.append(Mount("/", app=StaticFiles(directory=PUBLIC_DIR, html=True), name="public"))
+
 app = Starlette(
-    routes=[
-        Route("/api/health", health),
-        Route("/api/prepare", prepare, methods=["POST"]),
-        Route("/api/file", file),
-        # Everything in public/ (page, manifest, icons). On Vercel the CDN serves these directly.
-        Mount("/", app=StaticFiles(directory=PUBLIC_DIR, html=True), name="public"),
-    ],
+    routes=routes,
     exception_handlers={core.UserError: user_error_handler, Exception: server_error_handler},
 )

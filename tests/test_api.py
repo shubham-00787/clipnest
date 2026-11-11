@@ -172,3 +172,20 @@ def test_prepare_passes_quality_and_size_through(monkeypatch):
     out = run(post_json("/api/prepare", {"url": "https://youtu.be/x", "key": "family", "quality": "low"}))
     data = json.loads(out["body"])
     assert seen["quality"] == "low" and data["size_bytes"] == 12 * 1024 * 1024
+
+
+
+def test_app_starts_without_public_folder(monkeypatch):
+    """On Vercel, public/ is served by the CDN and isn't inside the Python function."""
+    import importlib
+    import pathlib
+
+    folder = main.PUBLIC_DIR
+    real_is_dir = pathlib.Path.is_dir
+    monkeypatch.setattr(pathlib.Path, "is_dir", lambda self: False if self == folder else real_is_dir(self))
+    try:
+        importlib.reload(main)                      # used to crash: "Directory ... does not exist"
+        assert run(call("GET", "/api/health"))["status"] == 200
+    finally:
+        monkeypatch.undo()
+        importlib.reload(main)
