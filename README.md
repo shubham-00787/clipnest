@@ -20,7 +20,7 @@ From live tests on a home connection in India (11 Nov 2026, yt-dlp 2026.10.26). 
 
 | Platform | Result | Notes |
 |---|---|---|
-| YouTube and Shorts | Works | With sound. Cloud servers are often blocked, see "YouTube from a cloud server" below. |
+| YouTube and Shorts | Works | With sound from a home connection. On cloud hosting YouTube blocks the server, so vidfetch uses backup servers, see "YouTube from a cloud server" below. |
 | Facebook videos | Works | With sound (tested with a public CNN video). |
 | Facebook Reels | Works | The Reel tested was silent at the source. |
 | X | Works | With sound (posts from 2024 and 2025). |
@@ -55,6 +55,7 @@ On Android, open the private link in Chrome and choose **Install app** (or **Add
 | `YTDLP_PROXY` | No | e.g. `socks5://127.0.0.1:1080`. Used for YouTube only (all sites if `PROXY_ALL=1`). |
 | `COOKIES_TXT` | No | Contents of a Netscape-format `cookies.txt`, from a **spare** account, never your main one. Helps with YouTube and Instagram. |
 | `DENO_PATH` | No | Path to a Deno binary. Normally not needed: the `deno` pip package provides one (YouTube needs a JavaScript runtime). |
+| `COBALT_INSTANCES` | No | Backup servers for YouTube when it blocks this server (comma-separated). Defaults to a few community cobalt servers; `off` disables the backup. |
 | `ALLOW_GENERIC` | No | `1` lets yt-dlp's generic extractor try any web page. Off by default so strangers can't use the server to fetch arbitrary URLs. |
 
 ## Deploy on Vercel (free)
@@ -93,12 +94,16 @@ Tests: `pip install pytest && pytest`.
 
 ## YouTube from a cloud server
 
-YouTube often refuses requests from cloud-provider IP addresses ("Sign in to confirm you're not a bot"). Instagram and Facebook are much less strict. If YouTube fails:
+YouTube refuses most requests from cloud servers ("Sign in to confirm you're not a bot"); from a home connection it works directly. When it blocks the server, vidfetch:
 
-- add `COOKIES_TXT` from a spare Google account, and/or
-- set `YTDLP_PROXY` to a proxy that doesn't look like a datacenter (residential proxies are paid; a free Cloudflare WARP proxy sometimes works).
+1. gets the title, channel and thumbnail from YouTube's public oEmbed endpoint, and
+2. asks community-run [cobalt](https://github.com/imputnet/cobalt) servers for the file, trying each in turn (`app/cobalt.py`).
 
-Running the Docker image on a home computer avoids the problem, since home IPs are trusted.
+Things to know:
+
+- **They're volunteer-run.** Any of them can go down or start requiring keys. If the backup stops working, look for working servers on community lists and set `COBALT_INSTANCES`. The official cobalt.tools servers aren't used; they're not meant for other projects.
+- **Privacy.** For YouTube on a blocked server, the video link is sent to one of those servers. Set `COBALT_INSTANCES=off` if you'd rather not.
+- **Other options.** `COOKIES_TXT` from a spare account or a `YTDLP_PROXY` can also help yt-dlp itself; residential proxies are reliable but paid.
 
 ## Project layout
 

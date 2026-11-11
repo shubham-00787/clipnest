@@ -8,7 +8,7 @@ import tempfile
 from pathlib import Path
 from urllib.parse import urlsplit
 
-from . import core, snapchat
+from . import cobalt, core, snapchat
 
 _SKIP_SUFFIXES = {".part", ".ytdl", ".temp", ".json", ".txt", ".jpg", ".jpeg", ".png", ".webp", ".vtt", ".srt"}
 _YOUTUBE_HOSTS = ("youtube.com", "youtu.be", "youtube-nocookie.com")
@@ -98,6 +98,15 @@ def _deno_path() -> str | None:
 _PARSE_ERRORS = ("unable to extract", "cannot parse data", "unable to parse", "no video formats found")
 
 
+class YouTubeBlocked(core.UserError):
+    """YouTube refused this server with its bot check."""
+
+
+def _is_bot_check(message: str) -> bool:
+    low = message.lower()
+    return "sign in to confirm" in low or "not a bot" in low
+
+
 def friendly_error(message: str) -> str:
     low = message.lower()
     if "sign in to confirm" in low or "not a bot" in low:
@@ -175,6 +184,8 @@ def _run(url: str, opts: dict, download: bool):
         first = str(exc)
     low = first.lower()
 
+    if is_youtube(url) and _is_bot_check(first):
+        raise YouTubeBlocked(friendly_error(first), 422)
     if snap_id and (any(p in low for p in _PARSE_ERRORS) or "no suitable extractor" in low or "unsupported url" in low):
         return _snapchat_fallback(url, snap_id, opts, download, first)
     if not any(p in low for p in _PARSE_ERRORS) or is_youtube(url):
@@ -227,7 +238,16 @@ def get_info(url: str, quality: str = core.DEFAULT_QUALITY) -> dict:
     the download will use so the size estimate matches."""
     opts = base_opts(url)
     opts.update(core.format_options(quality))
-    info = _run(url, opts, download=False)
+    try:
+        info = _run(url, opts, download=False)
+    except YouTubeBlocked:
+        if not cobalt.enabled():
+            raise
+        # The download will go through the backup servers; describe the video from oEmbed.
+        details = cobalt.youtube_details(url)
+        return {"title": details.get("title") or "YouTube video", "duration": None,
+                "thumbnail": details.get("thumbnail"), "uploader": details.get("uploader"), "site": "YouTube",
+                "height": None, "size_bytes": None, "no_sound": False}
     if info is None:
         raise core.UserError(friendly_error(""), 422)
     if info.get("_type") == "playlist":
@@ -255,7 +275,12 @@ def download(url: str, quality: str, workdir: str) -> Path:
     opts.update({"outtmpl": os.path.join(workdir, "video.%(ext)s"), "max_filesize": core.max_filesize_bytes()})
     if quality != "audio":
         opts["merge_output_format"] = "mp4"
-    _run(url, opts, download=True)
+    try:
+        _run(url, opts, download=True)
+    except YouTubeBlocked:
+        if not cobalt.enabled():
+            raise
+        return cobalt.download(url, quality, workdir)
 
     files = [p for p in Path(workdir).iterdir() if p.is_file() and p.suffix.lower() not in _SKIP_SUFFIXES]
     if not files:
