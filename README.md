@@ -16,15 +16,18 @@ No database, no accounts, nothing stored.
 
 ## Which sites work
 
-Based on yt-dlp's own list of supported sites (checked 11 Nov 2026). **Not yet verified end to end here: run `scripts/smoke.py` (below) to see what actually works from your setup.**
+From live tests on a home connection in India (11 Nov 2026, yt-dlp 2026.10.26). Sites change often, so re-check with `bash scripts/local_check.sh`.
 
-| Platform | Supported by yt-dlp | What to expect |
+| Platform | Result | Notes |
 |---|---|---|
-| YouTube and Shorts | Yes | Works from a home connection. Cloud servers are often blocked, see "YouTube from a cloud server" below. |
-| Instagram | Yes (public reels and posts) | Often needs `COOKIES_TXT` from a spare account. Stories always need a login. |
-| Facebook | Yes (watch, reels, fb.watch, public share links) | Public videos only. Friends-only posts can't be fetched. |
-| Snapchat | Yes, Spotlight links only | Public Spotlight videos. Stories and private snaps can't be fetched. |
-| TikTok, X, Reddit | Yes | Public videos. |
+| YouTube and Shorts | Works | With sound. Cloud servers are often blocked, see "YouTube from a cloud server" below. |
+| Facebook videos | Works | With sound (tested with a public CNN video). |
+| Facebook Reels | Works | The Reel tested was silent at the source. |
+| X | Works | With sound (posts from 2024 and 2025). |
+| Instagram | Works | Public reels and posts. Both test reels were silent, and Instagram itself marks them as having no sound; the page now shows "no sound" when a site says so. Some posts need `COOKIES_TXT`. |
+| Snapchat Spotlight | Fallback added | yt-dlp's Snapchat reader no longer understands Snapchat's page, so vidfetch reads the video link from the current page format itself (`app/snapchat.py`). Removed or private Snaps show a clear message. |
+| TikTok | Blocked in India | Works only where TikTok is reachable. |
+| Reddit | Needs a login | Add `COOKIES_TXT` from a spare account. |
 
 ## Check each platform for real
 
@@ -68,6 +71,16 @@ Vercel's free plan is for personal, non-commercial use. Limits to know: 5 minute
 Create a new **Blueprint** from this repo (it reads `render.yaml`) and enter `ACCESS_KEY` when asked. The free plan has 512 MB of memory, sleeps after 15 minutes idle, and allows about 5 GB of data a month.
 
 ## Run it yourself
+
+The quickest way, on a Mac or Linux machine with Python 3.10+:
+
+```bash
+bash scripts/local_check.sh
+```
+
+It installs everything into `.venv`, runs the tests, does a real download for each platform (YouTube, Shorts, Instagram, Facebook, Snapchat Spotlight, TikTok, X, Reddit) using example links from yt-dlp's own test cases, prints PASS/FAIL per platform, and then opens the app in your browser. Install [Deno](https://deno.com) first (`brew install deno`) or YouTube will fail.
+
+Step by step instead:
 
 ```bash
 docker build -t vidfetch .
