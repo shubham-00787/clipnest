@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: vidfetch
+    runtime: docker
+    plan: free
+    healthCheckPath: /api/health
+    envVars:
+      - key: ACCESS_KEY
+        sync: false   # you type this in the Render dashboard; never commit it

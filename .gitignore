@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+
+# Secrets and personal files
+.env
+.env.*
+cookies.txt
+*.conf
+scripts/links.txt
+
+# Test downloads and logs
+smoke-files/
+*.mp4
+*.m4a
+*.log
+
+# Deploy tooling
+.vercel/
+
+# Local transfer files and OS/editor clutter
+*.zip
+*.bundle
+Claude outputs/
+.DS_Store
+.idea/
+.vscode/

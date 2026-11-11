@@ -1,0 +1,4 @@
+starlette>=0.40
+uvicorn>=0.30
+yt-dlp[default]
+imageio-ffmpeg>=0.5
