@@ -1,0 +1,17 @@
+# yt-dlp breaks whenever a site changes. Redeploying pulls the newest yt-dlp,
+# because requirements.txt doesn't pin it.
+name: weekly-redeploy
+on:
+  schedule:
+    - cron: "17 3 * * 1"   # Mondays 03:17 UTC
+  workflow_dispatch: {}
+jobs:
+  redeploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger deploy hook
+        env:
+          HOOK: ${{ secrets.DEPLOY_HOOK_URL }}
+        run: |
+          if [ -z "$HOOK" ]; then echo "DEPLOY_HOOK_URL secret not set; skipping."; exit 0; fi
+          curl -fsS -X POST "$HOOK"

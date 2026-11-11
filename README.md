@@ -1,0 +1,104 @@
+# vidfetch
+
+Paste a link from YouTube, Shorts, Instagram, Facebook and other sites, and get the video back as an MP4. Medium quality (480p) is the default; Low, High, Best and Audio-only are options.
+
+Free and open source: [yt-dlp](https://github.com/yt-dlp/yt-dlp) does the downloading, [Starlette](https://www.starlette.io/) serves the app, and it runs on free hosting (Vercel, Render) or in Docker.
+
+> Only download videos you have the right to download. Private posts can't be fetched, and only sites that yt-dlp has a dedicated extractor for are supported.
+
+## How it works
+
+1. You open the app through your private link, then paste a video link (a whole share message is fine, the link is picked out).
+2. `POST /api/prepare` checks the access key and link, looks the video up, and returns a signed download link that lasts 10 minutes.
+3. `GET /api/file?t=…` downloads the video into a temporary folder, streams it to you, and deletes it.
+
+No database, no accounts, nothing stored.
+
+## Which sites work
+
+Based on yt-dlp's own list of supported sites (checked 11 Nov 2026). **Not yet verified end to end here: run `scripts/smoke.py` (below) to see what actually works from your setup.**
+
+| Platform | Supported by yt-dlp | What to expect |
+|---|---|---|
+| YouTube and Shorts | Yes | Works from a home connection. Cloud servers are often blocked, see "YouTube from a cloud server" below. |
+| Instagram | Yes (public reels and posts) | Often needs `COOKIES_TXT` from a spare account. Stories always need a login. |
+| Facebook | Yes (watch, reels, fb.watch, public share links) | Public videos only. Friends-only posts can't be fetched. |
+| Snapchat | Yes, Spotlight links only | Public Spotlight videos. Stories and private snaps can't be fetched. |
+| TikTok, X, Reddit | Yes | Public videos. |
+
+## Check each platform for real
+
+With the app running, copy `scripts/links.example.txt` to `scripts/links.txt`, put in real public links, and run:
+
+```bash
+python3 scripts/smoke.py --base http://localhost:8000 --key change-me --links scripts/links.txt --keep ./smoke-files
+```
+
+It runs each link through the same steps as the web page and prints PASS or FAIL per platform with timings, file sizes and the reason for any failure. `--keep` saves the videos so you can play them. It also works against your deployed site: `--base https://your-app.vercel.app`.
+
+## Use it from your phone's Share button
+
+On Android, open the private link in Chrome and choose **Install app** (or **Add to Home screen**). After that, **vidfetch** appears in the Share menu of Instagram, Facebook, YouTube and other apps: share a video to it and the lookup starts by itself. iPhone Safari doesn't support this, but "Add to Home Screen" still gives a one-tap icon (open the private link once inside the installed app to unlock it).
+
+## Settings (environment variables)
+
+| Name | Required | What it does |
+|---|---|---|
+| `ACCESS_KEY` | **Yes** | A secret that unlocks the app. Share the private link `https://your-app/#k=<ACCESS_KEY>` with family; the page remembers the key and hides it from the address bar. The app refuses to work without a key (set `VIDFETCH_OPEN=1` to deliberately run without one, e.g. on your own computer). |
+| `SECRET_KEY` | No | Key for signing download links. Defaults to a key derived from the access key. |
+| `MAX_DURATION_SECONDS` | No | Longest video allowed. Default 900 (15 min). |
+| `MAX_FILESIZE_MB` | No | Largest file allowed. Default 200. |
+| `MAX_CONCURRENT` | No | Downloads at once per server instance. Default 2. |
+| `YTDLP_PROXY` | No | e.g. `socks5://127.0.0.1:1080`. Used for YouTube only (all sites if `PROXY_ALL=1`). |
+| `COOKIES_TXT` | No | Contents of a Netscape-format `cookies.txt`, from a **spare** account, never your main one. Helps with YouTube and Instagram. |
+| `DENO_PATH` | No | Path to a Deno binary if it isn't on `PATH` (YouTube needs a JavaScript runtime). |
+| `ALLOW_GENERIC` | No | `1` lets yt-dlp's generic extractor try any web page. Off by default so strangers can't use the server to fetch arbitrary URLs. |
+
+## Deploy on Vercel (free)
+
+1. Sign in at [vercel.com](https://vercel.com) with GitHub, click **Add New → Project**, and import this repo.
+2. Under **Environment Variables**, add `ACCESS_KEY` (make one with `python3 -c "import secrets; print(secrets.token_urlsafe(16))"`).
+3. Deploy. You get `https://<name>.vercel.app`.
+4. Optional, to pick up new yt-dlp versions automatically: in the project's **Settings → Git → Deploy Hooks** create a hook, then add its URL as the repo secret `DEPLOY_HOOK_URL`. The `weekly-redeploy` workflow calls it every Monday.
+
+Vercel's free plan is for personal, non-commercial use. Limits to know: 5 minutes per request, 10 GB a month of data from the server. Videos are never re-encoded, only joined, to stay inside the free CPU allowance.
+
+## Deploy on Render (free, backup)
+
+Create a new **Blueprint** from this repo (it reads `render.yaml`) and enter `ACCESS_KEY` when asked. The free plan has 512 MB of memory, sleeps after 15 minutes idle, and allows about 5 GB of data a month.
+
+## Run it yourself
+
+```bash
+docker build -t vidfetch .
+docker run --rm -p 8000:8000 -e ACCESS_KEY=change-me vidfetch
+# open http://localhost:8000/#k=change-me
+```
+
+Without Docker: `pip install -r requirements.txt`, install `ffmpeg` and [Deno](https://deno.com), then `ACCESS_KEY=change-me uvicorn app.main:app` and open `http://localhost:8000/#k=change-me` (or start it with `VIDFETCH_OPEN=1` instead of a key if only you can reach it).
+
+Tests: `pip install pytest && pytest`.
+
+## YouTube from a cloud server
+
+YouTube often refuses requests from cloud-provider IP addresses ("Sign in to confirm you're not a bot"). Instagram and Facebook are much less strict. If YouTube fails:
+
+- add `COOKIES_TXT` from a spare Google account, and/or
+- set `YTDLP_PROXY` to a proxy that doesn't look like a datacenter (residential proxies are paid; a free Cloudflare WARP proxy sometimes works).
+
+Running the Docker image on a home computer avoids the problem, since home IPs are trusted.
+
+## Project layout
+
+```
+app/core.py     settings, link checks, quality presets, signed tokens
+app/ytdl.py     yt-dlp wrapper
+app/main.py     the web app
+api/index.py    Vercel entry point
+public/         the web page
+tests/          pytest suite
+```
+
+## License
+
+MIT
