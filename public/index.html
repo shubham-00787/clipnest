@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>vidfetch</title>
+<title>Clipnest</title>
 <meta name="description" content="Paste a video link, get the video.">
 <meta name="theme-color" content="#f5ece8">
 <meta name="color-scheme" content="light">
@@ -39,6 +39,7 @@
     --bars-filter: saturate(.35) brightness(1.08);
     --strip-dark: #3b2c47; --strip-mid: #6b5a78; --strip-light: #fbf6ff;
     --shadow: rgba(60, 30, 50, .16);
+    --ok-bg: #e4f0e6; --ok-ink: #22553a; --no-bg: #f3e1e6; --no-ink: #7b2f47;
     --danger-bg: #fbe4df; --danger-ink: #8a2a17;
     --gutter: clamp(16px, 2.6vw, 36px);
   }
@@ -61,6 +62,11 @@
     display: grid; grid-template-rows: auto 1fr auto; gap: clamp(14px, 1.8vw, 26px);
   }
   header { display: flex; align-items: center; gap: 12px; }
+  .nav { margin-left: auto; display: flex; gap: clamp(14px, 2vw, 26px); }
+  .nav a, .strip a, .foot a { color: var(--text); text-decoration: none; font-weight: 500; }
+  .nav a { color: var(--muted); }
+  .nav a:hover, .strip a:hover, .foot a:hover { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
+  .strip a { margin-left: 6px; }
   .mark { width: 26px; height: 26px; flex: none; }
   .mark .disc { fill: var(--brand); } .mark .tri { fill: var(--brand-ink); }
   .word { font-size: 1.15rem; font-weight: 700; letter-spacing: -.01em; }
@@ -187,6 +193,38 @@
   }
   .strip strong { color: var(--text); font-weight: 600; }
 
+  /* ---------- sections below the app ---------- */
+  html { scroll-behavior: smooth; scroll-padding-top: 16px; }
+  .more { max-width: 1240px; margin: 0 auto; padding: 0 var(--gutter) 24px; }
+  .section { padding: clamp(40px, 6vw, 72px) 0; border-top: 1px solid var(--line); }
+  .section h2 { margin: 0 0 8px; font-size: clamp(1.6rem, 2.6vw, 2.2rem); letter-spacing: -.02em; line-height: 1.1; }
+  .sub { margin: 0 0 24px; color: var(--muted); }
+  .steps { list-style: none; padding: 0; margin: 28px 0 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(20px, 3vw, 44px); }
+  .steps .num { display: block; font-size: 2.6rem; font-weight: 700; line-height: 1; color: var(--brand); margin-bottom: 10px; }
+  .steps h3 { margin: 0 0 6px; font-size: 1.12rem; }
+  .steps p { margin: 0; color: var(--muted); max-width: 34ch; }
+  .sites { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: clamp(24px, 4vw, 56px); }
+  .sites li { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; padding: 14px 0; border-bottom: 1px solid var(--line); }
+  .sites p { grid-column: 1 / -1; margin: 0; color: var(--muted); font-size: .93rem; }
+  .status { align-self: start; font-size: .8rem; font-weight: 600; padding: 3px 10px; border-radius: 99px; white-space: nowrap; }
+  .status.ok { background: var(--ok-bg); color: var(--ok-ink); }
+  .status.no { background: var(--no-bg); color: var(--no-ink); }
+  .devices-title { margin: 36px 0 14px; font-size: 1.12rem; }
+  .devices { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+  .devices li { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 16px 18px; }
+  .devices h4 { margin: 0 0 6px; font-size: 1rem; }
+  .devices p { margin: 0; color: var(--muted); font-size: .93rem; }
+  .faq { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: clamp(20px, 4vw, 56px); align-items: start; }
+  .answers details { border-bottom: 1px solid var(--line); }
+  .answers details:first-child { border-top: 1px solid var(--line); }
+  .answers summary { cursor: pointer; list-style: none; display: flex; justify-content: space-between; gap: 16px; padding: 15px 0; font-weight: 600; }
+  .answers summary::-webkit-details-marker { display: none; }
+  .answers summary::after { content: "+"; color: var(--brand); font-size: 1.3rem; line-height: 1; }
+  .answers details[open] summary::after { content: "\2212"; }
+  .answers summary:focus-visible { outline: 3px solid var(--brand); outline-offset: 2px; border-radius: 6px; }
+  .answers details p { margin: 0 0 16px; color: var(--muted); max-width: 64ch; }
+  .foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 24px; padding: 22px 0 8px; border-top: 1px solid var(--line); color: var(--muted); font-size: .9rem; }
+
   /* ---------- wide screens ---------- */
   @media (min-width: 1800px) {
     html { font-size: 16px; }
@@ -195,6 +233,7 @@
 
   /* ---------- narrow screens ---------- */
   @media (max-width: 900px) {
+    .steps, .sites, .devices, .faq { grid-template-columns: minmax(0, 1fr); }
     .main { grid-template-columns: minmax(0, 1fr); }
     .main { align-items: stretch; }
   }
@@ -217,6 +256,7 @@
     .viewport { aspect-ratio: auto; height: 34vh; }
   }
   @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
     .track.busy .knob { animation: none; left: 50%; }
     .go, .pill span, .save { transition: none; }
   }
@@ -226,7 +266,12 @@
 <div class="app">
   <header>
     <svg class="mark" viewBox="0 0 32 32" aria-hidden="true"><circle class="disc" cx="16" cy="16" r="16"/><path class="tri" d="M12.5 9.5v13l11-6.5z"/></svg>
-    <span class="word">vidfetch</span>
+    <span class="word">Clipnest</span>
+    <nav class="nav" aria-label="Sections">
+      <a href="#how">How it works</a>
+      <a href="#sites">Sites</a>
+      <a href="#faq">Questions</a>
+    </nav>
   </header>
 
   <div class="main">
@@ -283,10 +328,97 @@
   </div>
 
   <footer class="strip">
-    <span><strong>Works with</strong> YouTube, Shorts, Instagram, Facebook and most other video sites.</span>
+    <span><strong>Works with</strong> YouTube, Instagram, Facebook, X and Snapchat. <a href="#sites">See which sites work</a></span>
     <span id="limits">Private posts can't be downloaded.</span>
   </footer>
 </div>
+
+<main class="more">
+  <section id="how" class="section">
+    <h2>How it works</h2>
+    <ol class="steps">
+      <li>
+        <span class="num" aria-hidden="true">1</span>
+        <h3>Copy the link</h3>
+        <p>In Instagram, YouTube or Facebook, tap Share, then Copy link. Pasting the whole shared message works too.</p>
+      </li>
+      <li>
+        <span class="num" aria-hidden="true">2</span>
+        <h3>Pick a size</h3>
+        <p>Medium suits most phones and is easy on data. Choose Audio if you only want the sound.</p>
+      </li>
+      <li>
+        <span class="num" aria-hidden="true">3</span>
+        <h3>Get video, then Download</h3>
+        <p>The video saves to your device. Below is where to find it on each one.</p>
+      </li>
+    </ol>
+  </section>
+
+  <section id="sites" class="section">
+    <h2>Which sites work</h2>
+    <p class="sub">Checked in November 2026. Only public posts can be saved.</p>
+    <ul class="sites">
+      <li><strong>YouTube and Shorts</strong><span class="status ok">Works</span>
+        <p>When YouTube is busy, a backup service fetches the video, so it can take a little longer.</p></li>
+      <li><strong>Instagram</strong><span class="status ok">Works</span>
+        <p>Public reels and posts. Stories need a login, so they can't be saved.</p></li>
+      <li><strong>Facebook</strong><span class="status ok">Works</span>
+        <p>Public videos and Reels.</p></li>
+      <li><strong>X</strong><span class="status ok">Works</span>
+        <p>Posts that have a video.</p></li>
+      <li><strong>Snapchat</strong><span class="status ok">Works</span>
+        <p>Public Spotlight videos. Private snaps and stories can't be saved.</p></li>
+      <li><strong>Reddit</strong><span class="status no">Not available</span>
+        <p>Reddit now only shows videos to signed-in accounts.</p></li>
+      <li><strong>TikTok</strong><span class="status no">Not in India</span>
+        <p>TikTok is blocked in India, so it can't be reached from here.</p></li>
+    </ul>
+
+    <h3 class="devices-title">Where your video goes</h3>
+    <ul class="devices">
+      <li><h4>iPhone</h4><p>Safari asks before downloading, then saves to the Files app, in Downloads. To move it to Photos, open it, tap Share, then Save Video.</p></li>
+      <li><h4>Android</h4><p>Saves to Downloads and shows up in your Gallery. Add this page to your home screen and Clipnest appears in the Share menu.</p></li>
+      <li><h4>Computer</h4><p>Saves to your Downloads folder.</p></li>
+    </ul>
+  </section>
+
+  <section id="faq" class="section faq">
+    <h2>Questions</h2>
+    <div class="answers">
+      <details>
+        <summary>Is it free?</summary>
+        <p>Yes. Clipnest runs on free services, so please keep your private link within the family.</p>
+      </details>
+      <details>
+        <summary>Why does it say the post is private or needs a login?</summary>
+        <p>The video isn't public, or the site only shows it to signed-in people. Clipnest can only save public videos.</p>
+      </details>
+      <details>
+        <summary>Why is there no sound?</summary>
+        <p>Some videos are posted without sound. When the site says so, Clipnest shows "no sound" before you download.</p>
+      </details>
+      <details>
+        <summary>How long can a video be?</summary>
+        <p>Up to <span class="lim-min">15</span> minutes and <span class="lim-mb">200</span> MB. For longer videos, choose Low.</p>
+      </details>
+      <details>
+        <summary>Can I share straight from Instagram or YouTube?</summary>
+        <p>On Android, yes. Open your private link in Chrome, choose Add to Home screen, and Clipnest appears when you tap Share in other apps.</p>
+      </details>
+      <details>
+        <summary>What does Clipnest keep?</summary>
+        <p>Nothing on the server: each file is deleted as soon as it's sent. Your recent links are remembered only on your own device.</p>
+      </details>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <span>Clipnest is a small family tool.</span>
+    <span>Only download videos you made or have permission to save.</span>
+    <a href="https://github.com/shubham-00787/vidfetch">Source code</a>
+  </footer>
+</main>
 
 <script>
 (function () {
@@ -375,6 +507,8 @@
   var healthDone = fetch("/api/health").then(function (r) { return r.json(); }).then(function (h) {
     if (h.max_minutes && h.max_mb) {
       $("limits").textContent = "Videos up to " + h.max_minutes + " minutes and " + h.max_mb + " MB. Private posts can't be downloaded.";
+      Array.prototype.forEach.call(document.querySelectorAll(".lim-min"), function (el) { el.textContent = h.max_minutes; });
+      Array.prototype.forEach.call(document.querySelectorAll(".lim-mb"), function (el) { el.textContent = h.max_mb; });
     }
     if (!h.configured) {
       state.locked = true;

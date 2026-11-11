@@ -1,4 +1,6 @@
-# vidfetch
+# Clipnest
+
+_(This repository is still called `vidfetch`.)_
 
 Paste a link from YouTube, Shorts, Instagram, Facebook and other sites, and get the video back as an MP4. Medium quality (480p) is the default; Low, High, Best and Audio-only are options.
 

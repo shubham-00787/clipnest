@@ -1,6 +1,6 @@
 {
-  "name": "vidfetch",
-  "short_name": "vidfetch",
+  "name": "Clipnest",
+  "short_name": "Clipnest",
   "description": "Paste a video link, get the video.",
   "start_url": "/",
   "scope": "/",
