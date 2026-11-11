@@ -110,12 +110,12 @@ def _is_bot_check(message: str) -> bool:
 def friendly_error(message: str) -> str:
     low = message.lower()
     if "sign in to confirm" in low or "not a bot" in low:
-        return ("YouTube blocked this server (it thinks we're a bot). "
-                "Try again later, or ask the app owner to add cookies or a proxy.")
+        return "YouTube is blocking this server as a bot right now. Try again in a few minutes."
     if "unsupported url" in low:
         return "That site or link type isn't supported."
     if "authentication is required" in low or "--cookies" in low:
-        return "This site only allows downloads for logged-in accounts. The app owner can add cookies to enable it."
+        return ("Only signed-in accounts can see this video (it may be age-restricted or limited by its owner), "
+                "so it can't be downloaded here.")
     if any(s in low for s in ("login required", "log in", "requiring login", "private", "rate-limit reached")):
         return "That post is private or needs a login, so it can't be downloaded."
     if any(s in low for s in ("timed out", "domain not found", "name or service not known",

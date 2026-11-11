@@ -74,7 +74,7 @@ def test_no_retry_for_other_errors(monkeypatch):
     calls = install_fake_ytdlp(monkeypatch, behaviour)
     with pytest.raises(core.UserError) as exc:
         ytdl.get_info("https://www.reddit.com/r/videos/comments/abc/")
-    assert len(calls) == 1 and "logged-in" in exc.value.message
+    assert len(calls) == 1 and "signed-in" in exc.value.message
 
 
 def test_no_generic_retry_for_youtube(monkeypatch):

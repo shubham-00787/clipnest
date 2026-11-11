@@ -187,7 +187,7 @@ def test_generic_extractor_disabled_by_default(monkeypatch):
     ("ERROR: login required", "private"),
     ("ERROR: Unsupported URL: https://x", "isn't supported"),
     # these are the real messages from the first live run
-    ("ERROR: [Reddit] 6rrwyj: Account authentication is required. Use --cookies-from-browser or --cookies", "logged-in"),
+    ("ERROR: [Reddit] 6rrwyj: Account authentication is required. Use --cookies-from-browser or --cookies", "signed-in"),
     ("ERROR: [TikTok] 674: Unable to download webpage: Connection to www.tiktok.com timed out. (connect timeout=20.0)", "blocked"),
     ("ERROR: [twitter:amplify] 93a: Unable to download webpage: HTTP Error 500: Domain Not Found", "Couldn't reach"),
     ("ERROR: [facebook] 367: Cannot parse data; please report this issue", "changed its page"),
