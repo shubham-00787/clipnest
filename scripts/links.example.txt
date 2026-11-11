@@ -1,0 +1,15 @@
+# One link per line: a label, a space, then the link.
+# Copy this file to scripts/links.txt and put in PUBLIC videos you can open without logging in.
+# Lines starting with # are ignored.
+
+# YouTube's first-ever video: short, public, and stable. Good first test.
+youtube https://www.youtube.com/watch?v=jNQXAC9IVRw
+
+# Replace the rest with real links you have copied from the apps:
+# youtube-shorts https://www.youtube.com/shorts/XXXXXXXXXXX
+# instagram-reel https://www.instagram.com/reel/XXXXXXXXXXX/
+# facebook-watch https://www.facebook.com/watch/?v=XXXXXXXXXXXXXXX
+# facebook-short https://fb.watch/XXXXXXXXXX/
+# snapchat-spotlight https://www.snapchat.com/spotlight/XXXXXXXXXXXXXXXX
+# tiktok https://www.tiktok.com/@someone/video/XXXXXXXXXXXXXXXXXXX
+# x https://x.com/someone/status/XXXXXXXXXXXXXXXXXXX
