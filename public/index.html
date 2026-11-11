@@ -64,7 +64,7 @@
   header { display: flex; align-items: center; gap: 12px; }
   .nav { margin-left: auto; display: flex; gap: clamp(14px, 2vw, 26px); }
   .nav a, .strip a, .foot a { color: var(--text); text-decoration: none; font-weight: 500; }
-  .nav a { color: var(--muted); }
+  .nav a { color: var(--muted); display: inline-flex; align-items: center; justify-content: center; min-height: 44px; min-width: 44px; white-space: nowrap; }
   .nav a:hover, .strip a:hover, .foot a:hover { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
   .strip a { margin-left: 6px; }
   .mark { width: 26px; height: 26px; flex: none; }
@@ -243,6 +243,14 @@
     .paste, .chip { min-height: 44px; }
     .go { min-height: 52px; }
     .save { min-height: 48px; }
+  }
+  @media (max-width: 400px) {
+    .nav { gap: 12px; font-size: .88rem; }
+    .word { font-size: 1.05rem; }
+  }
+  @media (max-width: 360px) {  /* very small phones: menu gets its own row */
+    header { flex-wrap: wrap; row-gap: 0; }
+    .nav { margin-left: 0; width: 100%; justify-content: space-between; }
   }
   @media (max-width: 480px) {
     .pill span { min-width: 4.2rem; padding: 7px 11px; }
