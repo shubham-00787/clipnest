@@ -105,8 +105,7 @@ Running the Docker image on a home computer avoids the problem, since home IPs a
 ```
 app/core.py     settings, link checks, quality presets, signed tokens
 app/ytdl.py     yt-dlp wrapper
-app/main.py     the web app
-api/index.py    Vercel entry point
+app/main.py     the web app (Vercel runs this directly)
 public/         the web page
 tests/          pytest suite
 ```
