@@ -11,5 +11,4 @@ youtube https://www.youtube.com/watch?v=jNQXAC9IVRw
 # facebook-watch https://www.facebook.com/watch/?v=XXXXXXXXXXXXXXX
 # facebook-short https://fb.watch/XXXXXXXXXX/
 # snapchat-spotlight https://www.snapchat.com/spotlight/XXXXXXXXXXXXXXXX
-# tiktok https://www.tiktok.com/@someone/video/XXXXXXXXXXXXXXXXXXX
 # x https://x.com/someone/status/XXXXXXXXXXXXXXXXXXX

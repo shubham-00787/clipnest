@@ -1,7 +1,5 @@
 # Clipnest
 
-_(This repository is still called `vidfetch`.)_
-
 Paste a link from YouTube, Shorts, Instagram, Facebook and other sites, and get the video back as an MP4. Medium quality (480p) is the default; Low, High, Best and Audio-only are options.
 
 Free and open source: [yt-dlp](https://github.com/yt-dlp/yt-dlp) does the downloading, [Starlette](https://www.starlette.io/) serves the app, and it runs on free hosting (Vercel, Render) or in Docker.
@@ -18,18 +16,16 @@ No database, no accounts, nothing stored.
 
 ## Which sites work
 
-From live tests on a home connection in India (11 Nov 2026, yt-dlp 2026.10.26). Sites change often, so re-check with `bash scripts/local_check.sh`.
+From live tests on 11 Nov 2026 (yt-dlp 2026.10.26), on a home connection in India and on the Vercel deployment. Sites change often, so re-check with `bash scripts/local_check.sh`.
 
 | Platform | Result | Notes |
 |---|---|---|
-| YouTube and Shorts | Works | With sound from a home connection. On cloud hosting YouTube blocks the server, so vidfetch uses backup servers, see "YouTube from a cloud server" below. |
+| YouTube and Shorts | Works | Directly from a home connection. On cloud hosting YouTube blocks the server, so Clipnest uses backup servers (tested on Vercel), see "YouTube from a cloud server" below. |
 | Facebook videos | Works | With sound (tested with a public CNN video). |
 | Facebook Reels | Works | The Reel tested was silent at the source. |
 | X | Works | With sound (posts from 2024 and 2025). |
 | Instagram | Works | Public reels and posts. Both test reels were silent, and Instagram itself marks them as having no sound; the page now shows "no sound" when a site says so. Some posts need `COOKIES_TXT`. |
-| Snapchat Spotlight | Fallback added | yt-dlp's Snapchat reader no longer understands Snapchat's page, so vidfetch reads the video link from the current page format itself (`app/snapchat.py`). Removed or private Snaps show a clear message. |
-| TikTok | Blocked in India | Works only where TikTok is reachable. |
-| Reddit | Needs a login | Add `COOKIES_TXT` from a spare account. |
+| Snapchat Spotlight | Works | yt-dlp's Snapchat reader no longer understands Snapchat's page, so Clipnest reads the video link from the current page format itself (`app/snapchat.py`). Removed or private Snaps show a clear message. |
 
 ## Check each platform for real
 
@@ -43,13 +39,13 @@ It runs each link through the same steps as the web page and prints PASS or FAIL
 
 ## Use it from your phone's Share button
 
-On Android, open the private link in Chrome and choose **Install app** (or **Add to Home screen**). After that, **vidfetch** appears in the Share menu of Instagram, Facebook, YouTube and other apps: share a video to it and the lookup starts by itself. iPhone Safari doesn't support this, but "Add to Home Screen" still gives a one-tap icon (open the private link once inside the installed app to unlock it).
+On Android, open the private link in Chrome and choose **Install app** (or **Add to Home screen**). After that, **Clipnest** appears in the Share menu of Instagram, Facebook, YouTube and other apps: share a video to it and the lookup starts by itself. iPhone Safari doesn't support this, but "Add to Home Screen" still gives a one-tap icon (open the private link once inside the installed app to unlock it).
 
 ## Settings (environment variables)
 
 | Name | Required | What it does |
 |---|---|---|
-| `ACCESS_KEY` | **Yes** | A secret that unlocks the app. Share the private link `https://your-app/#k=<ACCESS_KEY>` with family; the page remembers the key and hides it from the address bar. The app refuses to work without a key (set `VIDFETCH_OPEN=1` to deliberately run without one, e.g. on your own computer). |
+| `ACCESS_KEY` | **Yes** | A secret that unlocks the app. Share the private link `https://your-app/#k=<ACCESS_KEY>` with family; the page remembers the key and hides it from the address bar. The app refuses to work without a key (set `CLIPNEST_OPEN=1` to deliberately run without one, e.g. on your own computer). |
 | `SECRET_KEY` | No | Key for signing download links. Defaults to a key derived from the access key. |
 | `MAX_DURATION_SECONDS` | No | Longest video allowed. Default 900 (15 min). |
 | `MAX_FILESIZE_MB` | No | Largest file allowed. Default 200. |
@@ -81,22 +77,23 @@ The quickest way, on a Mac or Linux machine with Python 3.10+:
 bash scripts/local_check.sh
 ```
 
-It installs everything into `.venv`, runs the tests, does a real download for each platform (YouTube, Shorts, Instagram, Facebook, Snapchat Spotlight, TikTok, X, Reddit) using example links from yt-dlp's own test cases, prints PASS/FAIL per platform, and then opens the app in your browser. 
+It installs everything into `.venv`, runs the tests, does a real download for each platform (YouTube, Shorts, Instagram, Facebook, Snapchat Spotlight, X) using example links from yt-dlp's own test cases, prints PASS/FAIL per platform, and then opens the app in your browser.
+
 Step by step instead:
 
 ```bash
-docker build -t vidfetch .
-docker run --rm -p 8000:8000 -e ACCESS_KEY=change-me vidfetch
+docker build -t clipnest .
+docker run --rm -p 8000:8000 -e ACCESS_KEY=change-me clipnest
 # open http://localhost:8000/#k=change-me
 ```
 
-Without Docker: `pip install -r requirements.txt` (this also brings Deno, which YouTube needs, and a copy of ffmpeg), then `ACCESS_KEY=change-me uvicorn app.main:app` and open `http://localhost:8000/#k=change-me` (or start it with `VIDFETCH_OPEN=1` instead of a key if only you can reach it).
+Without Docker: `pip install -r requirements.txt` (this also brings Deno, which YouTube needs, and a copy of ffmpeg), then `ACCESS_KEY=change-me uvicorn app.main:app` and open `http://localhost:8000/#k=change-me` (or start it with `CLIPNEST_OPEN=1` instead of a key if only you can reach it).
 
 Tests: `pip install pytest && pytest`.
 
 ## YouTube from a cloud server
 
-YouTube refuses most requests from cloud servers ("Sign in to confirm you're not a bot"); from a home connection it works directly. When it blocks the server, vidfetch:
+YouTube refuses most requests from cloud servers ("Sign in to confirm you're not a bot"); from a home connection it works directly. When it blocks the server, Clipnest:
 
 1. gets the title, channel and thumbnail from YouTube's public oEmbed endpoint, and
 2. asks community-run [cobalt](https://github.com/imputnet/cobalt) servers for the file, trying each in turn (`app/cobalt.py`).

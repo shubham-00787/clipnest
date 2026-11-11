@@ -29,7 +29,7 @@ DEFAULT_INSTANCES = (
     "https://api.cobalt.liubquanti.click",
     "https://rue-cobalt.xenon.zone",
 )
-USER_AGENT = "vidfetch/1.0 (+https://github.com/shubham-00787/vidfetch)"
+USER_AGENT = "clipnest/1.0 (+https://github.com/shubham-00787/clipnest)"
 _QUALITY = {"low": "360", "medium": "480", "high": "720", "best": "max"}
 _EXT_BY_TYPE = {"video/mp4": ".mp4", "audio/mp4": ".m4a", "video/webm": ".webm", "audio/webm": ".webm",
                 "audio/mpeg": ".mp3", "audio/ogg": ".ogg", "audio/opus": ".opus"}

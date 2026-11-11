@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: vidfetch
+    name: clipnest
     runtime: docker
     plan: free
     healthCheckPath: /api/health

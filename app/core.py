@@ -146,16 +146,21 @@ def access_locked() -> bool:
     return bool(os.environ.get("ACCESS_KEY"))
 
 
+def open_mode() -> bool:
+    """CLIPNEST_OPEN=1 deliberately runs the app without a key."""
+    return os.environ.get("CLIPNEST_OPEN") == "1"
+
+
 def server_configured() -> bool:
-    return access_locked() or os.environ.get("VIDFETCH_OPEN") == "1"
+    return access_locked() or open_mode()
 
 
 def check_access_key(provided: str | None) -> bool:
     """True if the access key is right. Raises 503 if the server has no key
-    configured (fails closed unless VIDFETCH_OPEN=1 is set on purpose)."""
+    configured (fails closed unless CLIPNEST_OPEN=1 is set on purpose)."""
     expected = os.environ.get("ACCESS_KEY")
     if not expected:
-        if os.environ.get("VIDFETCH_OPEN") == "1":
+        if open_mode():
             return True
         raise UserError(
             "This server isn't set up yet: the ACCESS_KEY setting is missing.",
@@ -167,8 +172,8 @@ def check_access_key(provided: str | None) -> bool:
 
 
 def _secret() -> bytes:
-    key = os.environ.get("SECRET_KEY") or os.environ.get("ACCESS_KEY") or "vidfetch-open"
-    return hashlib.sha256(("vidfetch:" + key).encode()).digest()
+    key = os.environ.get("SECRET_KEY") or os.environ.get("ACCESS_KEY") or "clipnest-open"
+    return hashlib.sha256(("clipnest:" + key).encode()).digest()
 
 
 def _b64(data: bytes) -> str:

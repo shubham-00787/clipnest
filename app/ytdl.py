@@ -35,7 +35,7 @@ def _cookiefile() -> str | None:
     content = os.environ.get("COOKIES_TXT")
     if not content:
         return None
-    path = os.path.join(tempfile.gettempdir(), "vidfetch-cookies.txt")
+    path = os.path.join(tempfile.gettempdir(), "clipnest-cookies.txt")
     try:
         existing = Path(path).read_text() if os.path.exists(path) else None
         if existing != content:

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Live check: does each platform really hand over a video through a running vidfetch?
+"""Live check: does each platform really hand over a video through a running Clipnest?
 
 Start the app first (see README), then:
 
@@ -80,7 +80,7 @@ def check(label: str, link: str, base: str, key: str, quality: str, keep_dir: st
         return row
 
     t1 = time.time()
-    path = os.path.join(keep_dir or tempfile.gettempdir(), f"vidfetch-smoke-{label}.bin")
+    path = os.path.join(keep_dir or tempfile.gettempdir(), f"clipnest-smoke-{label}.bin")
     try:
         with request(base + info["download_url"]) as res, open(path, "wb") as out:
             while True:
@@ -146,9 +146,7 @@ YTDLP_SAMPLES = [
     ("facebook", "Facebook", None),
     ("facebook-reel", "FacebookReel", None),
     ("snapchat", "SnapchatSpotlight", None),
-    ("tiktok", "TikTok", None),
     ("x", "Twitter", "/status/"),
-    ("reddit", "Reddit", None),
 ]
 
 
@@ -198,7 +196,7 @@ def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("links", nargs="*", help="label=url pairs")
     ap.add_argument("--links-file", "--links", dest="links_file", help="text file: one 'label url' per line")
-    ap.add_argument("--base", default="http://localhost:8000", help="where vidfetch is running")
+    ap.add_argument("--base", default="http://localhost:8000", help="where Clipnest is running")
     ap.add_argument("--key", default=os.environ.get("ACCESS_KEY", ""), help="the ACCESS_KEY (or set the env var)")
     ap.add_argument("--quality", default="low", choices=["low", "medium", "high", "best", "audio"],
                     help="quality to test (default low: fastest)")
@@ -231,7 +229,7 @@ def main() -> int:
         print(f"Can't reach {base}: {error_text(exc)}\nIs the app running?", file=sys.stderr)
         return 2
     if not health.get("configured"):
-        print("The app has no ACCESS_KEY set (or VIDFETCH_OPEN=1).", file=sys.stderr)
+        print("The app has no ACCESS_KEY set (or CLIPNEST_OPEN=1).", file=sys.stderr)
         return 2
 
     print(f"Testing {len(items)} platform(s) against {base} at quality '{args.quality}'\n")

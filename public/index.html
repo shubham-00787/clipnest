@@ -419,7 +419,7 @@
   <footer class="foot">
     <span>Clipnest is a small family tool.</span>
     <span>Only download videos you made or have permission to save.</span>
-    <a href="https://github.com/shubham-00787/vidfetch">Source code</a>
+    <a href="https://github.com/shubham-00787/clipnest">Source code</a>
   </footer>
 </main>
 
@@ -441,10 +441,12 @@
   var m = /(?:^#|&)k=([^&]+)/.exec(location.hash);
   if (m) {
     try { state.key = decodeURIComponent(m[1]); } catch (e) { state.key = m[1]; }
-    store("vidfetch_key", state.key);
+    store("clipnest_key", state.key);
     history.replaceState(null, "", location.pathname + location.search);  // hide the key
   } else {
-    state.key = load("vidfetch_key") || "";
+    // vidfetch_key: where the page kept the key before the rename to Clipnest
+    state.key = load("clipnest_key") || load("vidfetch_key") || "";
+    if (state.key) store("clipnest_key", state.key);
   }
 
   /* ---- small helpers ---- */
@@ -486,11 +488,11 @@
   }
 
   /* ---- recent links ---- */
-  function getRecent() { try { return JSON.parse(load("vidfetch_recent") || "[]"); } catch (e) { return []; } }
+  function getRecent() { try { return JSON.parse(load("clipnest_recent") || load("vidfetch_recent") || "[]"); } catch (e) { return []; } }
   function addRecent(item) {
     var list = getRecent().filter(function (r) { return r.url !== item.url; });
     list.unshift(item);
-    store("vidfetch_recent", JSON.stringify(list.slice(0, 4)));
+    store("clipnest_recent", JSON.stringify(list.slice(0, 4)));
     drawRecent();
   }
   function drawRecent() {

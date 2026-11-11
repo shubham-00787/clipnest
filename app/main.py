@@ -1,4 +1,4 @@
-"""vidfetch web app (Starlette / ASGI).
+"""Clipnest web app (Starlette / ASGI).
 
 Flow:
   POST /api/prepare  -> checks access key + link, looks the video up, returns a
@@ -26,7 +26,7 @@ from starlette.staticfiles import StaticFiles
 
 from . import core, ytdl
 
-log = logging.getLogger("vidfetch")
+log = logging.getLogger("clipnest")
 PUBLIC_DIR = Path(__file__).resolve().parent.parent / "public"
 
 _active = 0  # downloads running in this process right now
@@ -85,7 +85,7 @@ async def file(request: Request):
     if _active >= core.max_concurrent():
         raise core.UserError("Busy with other downloads. Try again in a minute.", 429)
 
-    workdir = tempfile.mkdtemp(prefix="vidfetch-")
+    workdir = tempfile.mkdtemp(prefix="clipnest-")
     _active += 1
     try:
         path = await run_in_threadpool(ytdl.download, payload["u"], payload["q"], workdir)

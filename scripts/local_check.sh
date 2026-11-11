@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# One command to set up, test and run vidfetch on your own computer:
+# One command to set up, test and run Clipnest on your own computer:
 #
 #     bash scripts/local_check.sh
 #

@@ -94,7 +94,7 @@ def test_safe_filename():
 # ---- access_key + tokens -----------------------------------------------------
 def test_access_key_fails_closed(monkeypatch):
     monkeypatch.delenv("ACCESS_KEY", raising=False)
-    monkeypatch.delenv("VIDFETCH_OPEN", raising=False)
+    monkeypatch.delenv("CLIPNEST_OPEN", raising=False)
     with pytest.raises(core.UserError) as exc:
         core.check_access_key("anything")
     assert exc.value.status == 503
@@ -102,7 +102,7 @@ def test_access_key_fails_closed(monkeypatch):
 
 def test_access_key_open_mode(monkeypatch):
     monkeypatch.delenv("ACCESS_KEY", raising=False)
-    monkeypatch.setenv("VIDFETCH_OPEN", "1")
+    monkeypatch.setenv("CLIPNEST_OPEN", "1")
     assert core.check_access_key("") is True
 
 

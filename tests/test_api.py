@@ -62,7 +62,7 @@ def test_health():
 
 def test_index_served():
     out = run(call("GET", "/"))
-    assert out["status"] == 200 and b"vidfetch" in out["body"]
+    assert out["status"] == 200 and b"Clipnest" in out["body"]
 
 
 def test_prepare_wrong_key(monkeypatch):

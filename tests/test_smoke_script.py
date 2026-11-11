@@ -42,4 +42,4 @@ def test_picks_one_usable_link_per_platform(monkeypatch):
     assert picked["instagram"] == ["https://www.instagram.com/p/abc/", "https://www.instagram.com/reel/def/"]
     assert picked["facebook"] == ["https://www.facebook.com/x/videos/2/"]    # known-broken example left out
     assert picked["snapchat"] == ["https://www.snapchat.com/spotlight/xyz"]
-    assert "tiktok" not in picked                                             # no extractor -> skipped, no crash
+    assert "x" not in picked                                                  # no extractor -> skipped, no crash
