@@ -94,16 +94,30 @@ def test_safe_filename():
 # ---- access_key + tokens -----------------------------------------------------
 def test_access_key_fails_closed(monkeypatch):
     monkeypatch.delenv("ACCESS_KEY", raising=False)
-    monkeypatch.delenv("CLIPNEST_OPEN", raising=False)
+    monkeypatch.delenv("CLIPNEST_PUBLIC", raising=False)
     with pytest.raises(core.UserError) as exc:
         core.check_access_key("anything")
     assert exc.value.status == 503
 
 
-def test_access_key_open_mode(monkeypatch):
-    monkeypatch.delenv("ACCESS_KEY", raising=False)
-    monkeypatch.setenv("CLIPNEST_OPEN", "1")
-    assert core.check_access_key("") is True
+@pytest.mark.parametrize("key", [None, "family"])
+def test_public_mode_needs_no_key(monkeypatch, key):
+    if key:
+        monkeypatch.setenv("ACCESS_KEY", key)   # then it only signs download links
+    else:
+        monkeypatch.delenv("ACCESS_KEY", raising=False)
+    monkeypatch.setenv("CLIPNEST_PUBLIC", "1")
+    assert core.check_access_key("") is True and core.check_access_key(None) is True
+    assert core.server_configured() and not core.access_locked()
+
+
+def test_public_mode_signs_with_the_key(monkeypatch):
+    monkeypatch.setenv("CLIPNEST_PUBLIC", "1")
+    monkeypatch.setenv("ACCESS_KEY", "one")
+    token = core.sign_token({"u": "https://x.test/v", "q": "low"}, now=1000)
+    monkeypatch.setenv("ACCESS_KEY", "two")
+    with pytest.raises(core.UserError):          # a different server secret can't verify it
+        core.verify_token(token, now=1001)
 
 
 def test_access_key_check(monkeypatch):

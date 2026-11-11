@@ -141,29 +141,31 @@ def safe_filename(title: str, ext: str) -> str:
 # --------------------------------------------------------------------------
 # access key + signed tokens
 # --------------------------------------------------------------------------
+def public_mode() -> bool:
+    """CLIPNEST_PUBLIC=1: anyone with the address can use the app, no key asked.
+    ACCESS_KEY (or SECRET_KEY), if set, then only signs the download links."""
+    return os.environ.get("CLIPNEST_PUBLIC") == "1"
+
+
 def access_locked() -> bool:
-    """True when visitors need the private link (an ACCESS_KEY is set)."""
-    return bool(os.environ.get("ACCESS_KEY"))
-
-
-def open_mode() -> bool:
-    """CLIPNEST_OPEN=1 deliberately runs the app without a key."""
-    return os.environ.get("CLIPNEST_OPEN") == "1"
+    """True when visitors need the private link (an ACCESS_KEY is set and the
+    app isn't public)."""
+    return bool(os.environ.get("ACCESS_KEY")) and not public_mode()
 
 
 def server_configured() -> bool:
-    return access_locked() or open_mode()
+    return access_locked() or public_mode()
 
 
 def check_access_key(provided: str | None) -> bool:
-    """True if the access key is right. Raises 503 if the server has no key
-    configured (fails closed unless CLIPNEST_OPEN=1 is set on purpose)."""
+    """True if the visitor may use the app. Raises 503 if the server is neither
+    public nor has a key (fails closed, so a forgotten setting never opens it)."""
+    if public_mode():
+        return True
     expected = os.environ.get("ACCESS_KEY")
     if not expected:
-        if open_mode():
-            return True
         raise UserError(
-            "This server isn't set up yet: the ACCESS_KEY setting is missing.",
+            "This server isn't set up yet: set ACCESS_KEY for a private app, or CLIPNEST_PUBLIC=1 for a public one.",
             503,
         )
     a = hashlib.sha256((provided or "").encode()).digest()
@@ -172,7 +174,7 @@ def check_access_key(provided: str | None) -> bool:
 
 
 def _secret() -> bytes:
-    key = os.environ.get("SECRET_KEY") or os.environ.get("ACCESS_KEY") or "clipnest-open"
+    key = os.environ.get("SECRET_KEY") or os.environ.get("ACCESS_KEY") or "clipnest-public"
     return hashlib.sha256(("clipnest:" + key).encode()).digest()
 
 

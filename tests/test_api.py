@@ -101,6 +101,14 @@ def test_prepare_bad_body():
     assert out["status"] == 400
 
 
+def test_public_app_works_without_key(monkeypatch):
+    monkeypatch.setenv("CLIPNEST_PUBLIC", "1")
+    health = json.loads(run(call("GET", "/api/health"))["body"])
+    assert health["configured"] is True and health["locked"] is False
+    out = run(post_json("/api/prepare", {"url": "https://youtu.be/x"}))
+    assert out["status"] == 200 and "/api/file?t=" in out["body"].decode()
+
+
 def test_prepare_unconfigured_server(monkeypatch):
     monkeypatch.delenv("ACCESS_KEY")
     out = run(post_json("/api/prepare", {"url": "https://youtu.be/x", "key": ""}))

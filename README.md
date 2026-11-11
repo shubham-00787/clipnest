@@ -8,8 +8,8 @@ Free and open source: [yt-dlp](https://github.com/yt-dlp/yt-dlp) does the downlo
 
 ## How it works
 
-1. You open the app through your private link, then paste a video link (a whole share message is fine, the link is picked out).
-2. `POST /api/prepare` checks the access key and link, looks the video up, and returns a signed download link that lasts 10 minutes.
+1. You open the app (through its private link, if you've made it private) and paste a video link (a whole share message is fine, the link is picked out).
+2. `POST /api/prepare` checks the link (and the access key on a private app), looks the video up, and returns a signed download link that lasts 10 minutes.
 3. `GET /api/file?t=…` downloads the video into a temporary folder, streams it to you, and deletes it.
 
 No database, no accounts, nothing stored.
@@ -39,14 +39,15 @@ It runs each link through the same steps as the web page and prints PASS or FAIL
 
 ## Use it from your phone's Share button
 
-On Android, open the private link in Chrome and choose **Install app** (or **Add to Home screen**). After that, **Clipnest** appears in the Share menu of Instagram, Facebook, YouTube and other apps: share a video to it and the lookup starts by itself. iPhone Safari doesn't support this, but "Add to Home Screen" still gives a one-tap icon (open the private link once inside the installed app to unlock it).
+On Android, open the app in Chrome and choose **Install app** (or **Add to Home screen**). After that, **Clipnest** appears in the Share menu of Instagram, Facebook, YouTube and other apps: share a video to it and the lookup starts by itself. iPhone Safari doesn't support this, but "Add to Home Screen" still gives a one-tap icon. On a private app, open the private link once inside the installed app to unlock it.
 
 ## Settings (environment variables)
 
 | Name | Required | What it does |
 |---|---|---|
-| `ACCESS_KEY` | **Yes** | A secret that unlocks the app. Share the private link `https://your-app/#k=<ACCESS_KEY>` with family; the page remembers the key and hides it from the address bar. The app refuses to work without a key (set `CLIPNEST_OPEN=1` to deliberately run without one, e.g. on your own computer). |
-| `SECRET_KEY` | No | Key for signing download links. Defaults to a key derived from the access key. |
+| `CLIPNEST_PUBLIC` | **This or `ACCESS_KEY`** | `1` makes the app public: anyone with the address can use it, no key asked. Also set `SECRET_KEY` (or keep an `ACCESS_KEY`) so download links are signed with a real secret. |
+| `ACCESS_KEY` | **This or `CLIPNEST_PUBLIC`** | Makes the app private. Share the private link `https://your-app/#k=<ACCESS_KEY>`; the page remembers the key and hides it from the address bar. With `CLIPNEST_PUBLIC=1` it's only used to sign download links. The app refuses to work if neither is set. |
+| `SECRET_KEY` | No | Key for signing download links. Defaults to the access key. |
 | `MAX_DURATION_SECONDS` | No | Longest video allowed. Default 900 (15 min). |
 | `MAX_FILESIZE_MB` | No | Largest file allowed. Default 200. |
 | `MAX_CONCURRENT` | No | Downloads at once per server instance. Default 2. |
@@ -59,15 +60,15 @@ On Android, open the private link in Chrome and choose **Install app** (or **Add
 ## Deploy on Vercel (free)
 
 1. Sign in at [vercel.com](https://vercel.com) with GitHub, click **Add New → Project**, and import this repo.
-2. Under **Environment Variables**, add `ACCESS_KEY` (make one with `python3 -c "import secrets; print(secrets.token_urlsafe(16))"`).
+2. Under **Environment Variables**, add `CLIPNEST_PUBLIC` = `1` and a `SECRET_KEY` for a public app, or just an `ACCESS_KEY` for a private one. Make a secret with `python3 -c "import secrets; print(secrets.token_urlsafe(16))"`.
 3. Deploy. You get `https://<name>.vercel.app`.
 4. Optional, to pick up new yt-dlp versions automatically: in the project's **Settings → Git → Deploy Hooks** create a hook, then add its URL as the repo secret `DEPLOY_HOOK_URL`. The `weekly-redeploy` workflow calls it every Monday.
 
-Vercel's free plan is for personal, non-commercial use. Limits to know: 5 minutes per request, 10 GB a month of data from the server. Videos are never re-encoded, only joined, to stay inside the free CPU allowance.
+Vercel's free plan is for personal, non-commercial use. Limits to know (shared by everyone using a public app; if they run out, Vercel pauses the app until the month resets): 5 minutes per request, 10 GB a month of data from the server. Videos are never re-encoded, only joined, to stay inside the free CPU allowance.
 
 ## Deploy on Render (free, backup)
 
-Create a new **Blueprint** from this repo (it reads `render.yaml`) and enter `ACCESS_KEY` when asked. The free plan has 512 MB of memory, sleeps after 15 minutes idle, and allows about 5 GB of data a month.
+Create a new **Blueprint** from this repo (it reads `render.yaml`) and enter `ACCESS_KEY` when asked (add `CLIPNEST_PUBLIC=1` too to make it public). The free plan has 512 MB of memory, sleeps after 15 minutes idle, and allows about 5 GB of data a month.
 
 ## Run it yourself
 
@@ -87,7 +88,7 @@ docker run --rm -p 8000:8000 -e ACCESS_KEY=change-me clipnest
 # open http://localhost:8000/#k=change-me
 ```
 
-Without Docker: `pip install -r requirements.txt` (this also brings Deno, which YouTube needs, and a copy of ffmpeg), then `ACCESS_KEY=change-me uvicorn app.main:app` and open `http://localhost:8000/#k=change-me` (or start it with `CLIPNEST_OPEN=1` instead of a key if only you can reach it).
+Without Docker: `pip install -r requirements.txt` (this also brings Deno, which YouTube needs, and a copy of ffmpeg), then `ACCESS_KEY=change-me uvicorn app.main:app` and open `http://localhost:8000/#k=change-me` (or start it with `CLIPNEST_PUBLIC=1` instead of a key and open `http://localhost:8000`).
 
 Tests: `pip install pytest && pytest`.
 

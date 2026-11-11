@@ -391,7 +391,7 @@
     <div class="answers">
       <details>
         <summary>Is it free?</summary>
-        <p>Yes. Clipnest runs on free services, so please keep your private link within the family.</p>
+        <p>Yes, and there's no sign-up. Clipnest runs on free services, so it can be slow when many people use it at once.</p>
       </details>
       <details>
         <summary>Why does it say the post is private or needs a login?</summary>
@@ -407,7 +407,7 @@
       </details>
       <details>
         <summary>Can I share straight from Instagram or YouTube?</summary>
-        <p>On Android, yes. Open your private link in Chrome, choose Add to Home screen, and Clipnest appears when you tap Share in other apps.</p>
+        <p>On Android, yes. Open Clipnest in Chrome, choose Add to Home screen, and Clipnest appears when you tap Share in other apps.</p>
       </details>
       <details>
         <summary>What does Clipnest keep?</summary>
@@ -417,7 +417,7 @@
   </section>
 
   <footer class="foot">
-    <span>Clipnest is a small family tool.</span>
+    <span>Clipnest is free and open source.</span>
     <span>Only download videos you made or have permission to save.</span>
     <a href="https://github.com/shubham-00787/clipnest">Source code</a>
   </footer>
@@ -517,7 +517,7 @@
     }
     if (!h.configured) {
       state.locked = true;
-      note("This server isn't set up yet. The owner needs to add an ACCESS_KEY setting.", "error");
+      note("This server isn't set up yet. The owner needs to add the ACCESS_KEY or CLIPNEST_PUBLIC setting.", "error");
       els.go.disabled = true;
     } else if (h.locked && !state.key) {
       state.locked = true;

@@ -229,7 +229,7 @@ def main() -> int:
         print(f"Can't reach {base}: {error_text(exc)}\nIs the app running?", file=sys.stderr)
         return 2
     if not health.get("configured"):
-        print("The app has no ACCESS_KEY set (or CLIPNEST_OPEN=1).", file=sys.stderr)
+        print("The app is neither public (CLIPNEST_PUBLIC=1) nor has an ACCESS_KEY.", file=sys.stderr)
         return 2
 
     print(f"Testing {len(items)} platform(s) against {base} at quality '{args.quality}'\n")
