@@ -191,3 +191,17 @@ def test_estimate_bytes():
     # one stream has no size -> we don't guess
     assert ytdl.estimate_bytes({"requested_formats": [{"filesize": 8_000_000}, {}]}) is None
     assert ytdl.estimate_bytes({}) is None
+
+
+def test_deno_from_pip_package_when_not_on_path(monkeypatch):
+    import sys, types
+    monkeypatch.delenv("DENO_PATH", raising=False)
+    monkeypatch.setattr(ytdl.shutil, "which", lambda name: None)
+    fake = types.ModuleType("deno"); fake.find_deno_bin = lambda: "/site-packages/deno/bin/deno"
+    monkeypatch.setitem(sys.modules, "deno", fake)
+    assert ytdl.base_opts("https://youtu.be/x")["js_runtimes"] == {"deno": {"path": "/site-packages/deno/bin/deno"}}
+
+
+def test_deno_path_env_wins(monkeypatch):
+    monkeypatch.setenv("DENO_PATH", "/opt/deno")
+    assert ytdl.base_opts("https://youtu.be/x")["js_runtimes"] == {"deno": {"path": "/opt/deno"}}

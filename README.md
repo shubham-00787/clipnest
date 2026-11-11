@@ -54,7 +54,7 @@ On Android, open the private link in Chrome and choose **Install app** (or **Add
 | `MAX_CONCURRENT` | No | Downloads at once per server instance. Default 2. |
 | `YTDLP_PROXY` | No | e.g. `socks5://127.0.0.1:1080`. Used for YouTube only (all sites if `PROXY_ALL=1`). |
 | `COOKIES_TXT` | No | Contents of a Netscape-format `cookies.txt`, from a **spare** account, never your main one. Helps with YouTube and Instagram. |
-| `DENO_PATH` | No | Path to a Deno binary if it isn't on `PATH` (YouTube needs a JavaScript runtime). |
+| `DENO_PATH` | No | Path to a Deno binary. Normally not needed: the `deno` pip package provides one (YouTube needs a JavaScript runtime). |
 | `ALLOW_GENERIC` | No | `1` lets yt-dlp's generic extractor try any web page. Off by default so strangers can't use the server to fetch arbitrary URLs. |
 
 ## Deploy on Vercel (free)
@@ -78,8 +78,7 @@ The quickest way, on a Mac or Linux machine with Python 3.10+:
 bash scripts/local_check.sh
 ```
 
-It installs everything into `.venv`, runs the tests, does a real download for each platform (YouTube, Shorts, Instagram, Facebook, Snapchat Spotlight, TikTok, X, Reddit) using example links from yt-dlp's own test cases, prints PASS/FAIL per platform, and then opens the app in your browser. Install [Deno](https://deno.com) first (`brew install deno`) or YouTube will fail.
-
+It installs everything into `.venv`, runs the tests, does a real download for each platform (YouTube, Shorts, Instagram, Facebook, Snapchat Spotlight, TikTok, X, Reddit) using example links from yt-dlp's own test cases, prints PASS/FAIL per platform, and then opens the app in your browser. 
 Step by step instead:
 
 ```bash
@@ -88,7 +87,7 @@ docker run --rm -p 8000:8000 -e ACCESS_KEY=change-me vidfetch
 # open http://localhost:8000/#k=change-me
 ```
 
-Without Docker: `pip install -r requirements.txt`, install `ffmpeg` and [Deno](https://deno.com), then `ACCESS_KEY=change-me uvicorn app.main:app` and open `http://localhost:8000/#k=change-me` (or start it with `VIDFETCH_OPEN=1` instead of a key if only you can reach it).
+Without Docker: `pip install -r requirements.txt` (this also brings Deno, which YouTube needs, and a copy of ffmpeg), then `ACCESS_KEY=change-me uvicorn app.main:app` and open `http://localhost:8000/#k=change-me` (or start it with `VIDFETCH_OPEN=1` instead of a key if only you can reach it).
 
 Tests: `pip install pytest && pytest`.
 

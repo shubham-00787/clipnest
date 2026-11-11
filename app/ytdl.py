@@ -69,10 +69,28 @@ def base_opts(url: str) -> dict:
     cookies = _cookiefile()
     if cookies:
         opts["cookiefile"] = cookies
-    deno = os.environ.get("DENO_PATH")
+    deno = _deno_path()
     if deno:
         opts["js_runtimes"] = {"deno": {"path": deno}}
     return opts
+
+
+def _deno_path() -> str | None:
+    """Where the Deno JavaScript runtime is (YouTube needs one).
+
+    DENO_PATH wins; a deno on PATH is found by yt-dlp itself; otherwise use the
+    copy the official `deno` pip package ships (that's how it gets onto Vercel,
+    which only installs Python packages)."""
+    if os.environ.get("DENO_PATH"):
+        return os.environ["DENO_PATH"]
+    if shutil.which("deno"):
+        return None
+    try:
+        import deno
+
+        return deno.find_deno_bin()
+    except Exception:
+        return None
 
 
 # yt-dlp messages that mean "the site's page changed and the dedicated

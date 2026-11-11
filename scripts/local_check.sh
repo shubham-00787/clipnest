@@ -29,7 +29,7 @@ python -m pip install -q -r requirements.txt pytest
 
 step "Checking helpers"
 if command -v ffmpeg >/dev/null 2>&1; then echo "ffmpeg: $(command -v ffmpeg)"; else echo "ffmpeg: not installed, using the copy bundled with imageio-ffmpeg"; fi
-if command -v deno >/dev/null 2>&1; then echo "deno:   $(command -v deno)"; else echo "deno:   NOT installed. YouTube needs it: brew install deno  (then run this again)"; fi
+if command -v deno >/dev/null 2>&1; then echo "deno:   $(command -v deno)"; else echo "deno:   $(python -c 'import deno; print(deno.find_deno_bin())' 2>/dev/null || echo 'MISSING: YouTube will fail')  (from the deno pip package)"; fi
 echo "yt-dlp: $(python -m yt_dlp --version)"
 
 step "Running the test suite"
