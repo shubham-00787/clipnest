@@ -39,7 +39,7 @@
     --bars-filter: saturate(.35) brightness(1.08);
     --strip-dark: #3b2c47; --strip-mid: #6b5a78; --strip-light: #fbf6ff;
     --shadow: rgba(60, 30, 50, .16);
-    --ok-bg: #e4f0e6; --ok-ink: #22553a; --no-bg: #f3e1e6; --no-ink: #7b2f47;
+    --ok-bg: #e4f0e6; --ok-ink: #22553a;
     --danger-bg: #fbe4df; --danger-ink: #8a2a17;
     --gutter: clamp(16px, 2.6vw, 36px);
   }
@@ -208,7 +208,6 @@
   .sites p { grid-column: 1 / -1; margin: 0; color: var(--muted); font-size: .93rem; }
   .status { align-self: start; font-size: .8rem; font-weight: 600; padding: 3px 10px; border-radius: 99px; white-space: nowrap; }
   .status.ok { background: var(--ok-bg); color: var(--ok-ink); }
-  .status.no { background: var(--no-bg); color: var(--no-ink); }
   .devices-title { margin: 36px 0 14px; font-size: 1.12rem; }
   .devices { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
   .devices li { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 16px 18px; }
@@ -377,10 +376,6 @@
         <p>Posts that have a video.</p></li>
       <li><strong>Snapchat</strong><span class="status ok">Works</span>
         <p>Public Spotlight videos. Private snaps and stories can't be saved.</p></li>
-      <li><strong>Reddit</strong><span class="status no">Not available</span>
-        <p>Reddit now only shows videos to signed-in accounts.</p></li>
-      <li><strong>TikTok</strong><span class="status no">Not in India</span>
-        <p>TikTok is blocked in India, so it can't be reached from here.</p></li>
     </ul>
 
     <h3 class="devices-title">Where your video goes</h3>
